@@ -1,3 +1,18 @@
+gem5 with GDDR simulation model
+--------------------------------------------------------------------------------
+GDDR6 model:
+src/mem/DRAMCtrl.py
+
+Simulation configuration file:
+configs/dram/sweep_gddr6.py
+
+How to run:
+>./run.sh
+>./plot.sh
+
+
+Oringal README from gem5
+--------------------------------------------------------------------------------
 This is the gem5 simulator.
 
 The main website can be found at http://www.gem5.org
