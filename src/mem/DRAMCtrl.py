@@ -1064,6 +1064,114 @@ class GDDR5_4000_2x32(DRAMCtrl):
     # Assume 2 cycles
     tRTW = '2ns'
 
+    # Default different rank bus delay to 2 CK, @1000 MHz = 2 ns
+    tCS = '2ns'
+    tREFI = '3.9us'
+
+
+# A single GDDR6 x32 interface, with
+# default timings based on a GDDR6-16000 8 Gbit part
+# (Micron MT61K256M32-16) in a 2x16 configuration.
+class GDDR6_16000_2x16(DRAMCtrl):
+    # size of device
+    device_size = '512MB' # Size per channel
+
+    # 2x16 configuration, 1 device with a 16-bit interface
+    device_bus_width = 16
+
+    # GDDR6 is a BL16 device
+    burst_length = 16
+
+    # Each device has a page (row buffer) size of 2Kbits (256Bytes)
+    device_rowbuffer_size = '256B'
+
+    # 2x32 configuration, so 2 devices
+    devices_per_rank = 2
+
+    # assume single rank
+    ranks_per_channel = 1
+
+    # GDDR6 has 4 bank groups
+    bank_groups_per_rank = 4 # 4 for gddr6
+
+    # GDDR6 has 16 banks with 4 bank groups
+    banks_per_rank = 16 # 16 for gddr6
+
+    # 2000 MHz
+    tCK = '0.5ns'
+
+    # tBURST is equivalent to tCCD_S: CAS-to-CAS delay for bursts to different
+    # bank groups
+    # 2 * tCK
+    tBURST = '1ns'
+
+    # tCCD_L: CAS-to-CAS delay for bursts to the same bank group
+    # 4 * tCK
+    tCCD_L = '2ns'
+
+    # tRCD: Row to Column command Delay latency. The time interval between row
+    # access and data ready at sense amplifiers
+    tRCD = '6ns' # Not found in spec, assume 12 * tCK
+
+    # tCL: CAS Latency. is not directly found in datasheet and assumed equal
+    # tRCD
+    tCL = '6ns' # Not found in spec, assume 12 * tCK
+
+    # tRP: Row Precharge latency. The time interval that it takes for a DRAM
+    # array to be precharged for another row access.
+    tRP = '6ns' # Not found in spec, assume 12 * tCK
+
+    # tRAS: Row Access Strobe latency. The time interval between a row access
+    # command and data restoration in a DRAM array.
+    # Max = 9 * tREFI
+    # min/typical Not found in spec, assume the same as GDDR5
+    tRAS = '28ns'
+
+    # RRD_S (different bank group)
+    # RRD_S is 5.5 ns in datasheet.
+    # rounded to the next multiple of tCK
+    tRRD = '3ns' # Not found in spec, assume 6 * tCK
+
+    # RRD_L (same bank group)
+    # RRD_L is 5.5 ns in datasheet.
+    # rounded to the next multiple of tCK
+    tRRD_L = '3ns' # Not found in spec, assume 6 * tCK
+
+    # tXAW: X activation window (tFAW for 4 bank activation window)
+    # time window in which a maximum number of activates are allowed
+    # to take place, set to 0 to disable
+    tXAW = '9ns' # Not found in spec, assume 3 * tRRD
+
+    # tXAW < 4 x tRRD.
+    # Therefore, activation limit is set to 0
+    activation_limit = 0
+
+    # Refresh Cycle latency. The time interval between Refresh and Activation
+    # commands
+    tRFC = '32ns' # Not found in spec
+
+    # Write Recovery latency. The minimum time interval between the end of
+    # write data burst and the start of a precharge command
+    tWR = '6ns' # Not found in spec
+
+    # write-to-read, same rank turnaround penalty
+    # Here using the average of WTR_S and WTR_L
+    tWTR = '2.5ns' # Not found in spec
+
+    # Read-to-Precharge 2 CK
+    tRTP = '1ns' # Not found in spec
+
+    # read-to-write, same rank turnaround penalty
+    # Assume 2 cycles
+    tRTW = '1ns' # Not found in spec
+
+    # rank-to-rank bus delay penalty
+    tCS = '1ns' # Not found in spec
+
+    # tREFI: Average periodic refresh interval with REFab command
+    tREFI = '1.9us' # Max
+
+
 # A single HBM x128 interface (one command and address bus), with
 # default timings based on data publically released
 # ("HBM: Memory Solution for High Performance Processors", MemCon, 2014),
