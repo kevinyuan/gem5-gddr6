@@ -916,7 +916,7 @@ DRAMCtrl::chooseNextFRFCFS(DRAMPacketQueue& queue, Tick extra_col_delay)
 void
 DRAMCtrl::accessAndRespond(PacketPtr pkt, Tick static_latency)
 {
-    DPRINTF(DRAM, "Responding to Address %lld.. ",pkt->getAddr());
+    DPRINTF(DRAM, "Responding to Address %lld.. \n",pkt->getAddr());
 
     bool needsResponse = pkt->needsResponse();
     // do the actual memory access which also turns the packet into a
@@ -2716,6 +2716,9 @@ DRAMCtrl::regStats()
         .precision(2);
 
     peakBW = (SimClock::Frequency / tBURST) * burstSize / 1000000;
+
+    DPRINTF(DRAMState, "SimFrequency: %d, tCK: %d, tBURST: %d, burstSize:
+            %d\n", SimClock::Frequency, tCK, tBURST, burstSize);
 
     busUtil
         .name(name() + ".busUtil")
