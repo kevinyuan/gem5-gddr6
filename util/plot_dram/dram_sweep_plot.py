@@ -120,6 +120,9 @@ def main():
     stats.close()
 
 
+    # print "Length of Peak bandwidth = %d, bus utilisation = %d, and average
+    # power = %d\n" % (len(peak_bw), len(bus_util), len(avg_pwr))
+
     # Sanity check
     if not (len(peak_bw) == len(bus_util) and len(bus_util) == len(avg_pwr)):
         print "Peak bandwidth, bus utilisation, and average power do not match"
@@ -147,45 +150,63 @@ def main():
         i += 1
         # If we have completed a sweep over the stride sizes,
         # start anew
-        if i == max_size / burst_size:
-            zs.append(z)
-            z = []
-            i = 0
+        # Put every 8 samples in another dimension (bank)
+        # One or more last n samples in z[] may be discard
+        #if i == max_size / (burst_size):
+        #    zs.append(z)
+        #    z = []
+        #    i = 0
+
+        #print " j = %d, i = %d " % (j, i)
+
+    #print "zs = %d, bank = %d" % (len(zs), banks)
 
     # We should have a 2D grid with as many columns as banks
-    if len(zs) != banks:
-        print "Unexpected number of data points in stats output"
-        exit(-1)
+#    if len(zs) != banks:
+#        print "Unexpected number of data points in stats output: zs = %d, bank
+#        = %d" % (len(zs), banks)
+#        exit(-1)
 
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    #ax = fig.gca(projection='3d')
     X = np.arange(burst_size, max_size + 1, burst_size)
+    z = np.resize(z, np.size(X))
+    #print "X:", X
+    #print "zs:", z
+
     Y = np.arange(1, banks + 1, 1)
-    X, Y = np.meshgrid(X, Y)
+    #X, Y = np.meshgrid(X, Y)
 
     # the values in the util are banks major, so we see groups for each
     # stride size in order
-    Z = np.array(zs)
+    #Z = np.array(zs)
 
-    surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm,
-                           linewidth=0, antialiased=False)
+#    surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm,
+#                           linewidth=0, antialiased=False)
 
-    # Change the tick frequency to 64
-    start, end = ax.get_xlim()
-    ax.xaxis.set_ticks(np.arange(start, end + 1, 64))
+    plt.plot(X, z, '-o')
 
-    ax.set_xlabel('Bytes per activate')
-    ax.set_ylabel('Banks')
+    for i,j in zip(X,z):
+        jj = round(512*j/100,2)
+        plt.text(i-8, j+2, '   ' + str(j)+'%\n('+str(jj)+' Gbps)')
 
-    if mode == 'u':
-        ax.set_zlabel('Utilisation (%)')
-    elif mode == 'p':
-        ax.set_zlabel('Power (mW)')
-    elif mode == 'e':
-        ax.set_zlabel('Power efficiency (mW / GByte / s)')
+    plt.xticks(np.arange(0, 512 + 1, 64))
 
-    # Add a colorbar
-    fig.colorbar(surf, shrink=0.5, pad=.1, aspect=10)
+    plt.ylim(0, 100)
+
+    plt.xlabel('Access length (Bytes)')
+    plt.ylabel('Utilisation (%)')
+
+#
+#    if mode == 'u':
+#        ax.set_zlabel('Utilisation (%)')
+#    elif mode == 'p':
+#        ax.set_zlabel('Power (mW)')
+#    elif mode == 'e':
+#        ax.set_zlabel('Power efficiency (mW / GByte / s)')
+#
+#    # Add a colorbar
+#    fig.colorbar(surf, shrink=0.5, pad=.1, aspect=10)
 
     plt.show()
 
